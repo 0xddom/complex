@@ -5,22 +5,26 @@
 mod complex;
 mod repl;
 
-use complex::Complex;
-use repl::{read_command,Command, AppState,eval_cmd};
+use repl::{read_command,Command, AppState, eval_cmd};
 
-fn main() {
-    let mut state = AppState::initial_state();
-    loop {
-        match read_command() {
-            Err(msg) => println!("{}", msg),
-            Ok(Command::Exit) => break,
-            Ok(cmd) => {
-                match eval_cmd(state, cmd) {
-                    Ok(s) => state = s,
-                    Err(msg) => panic!("{}", msg)
+fn main_loop(state: AppState) {
+    match read_command() {
+        Err(msg) => println!("{}", msg),
+        Ok(Command::Exit) => return,
+        Ok(cmd) => {
+            match eval_cmd(state, cmd) {
+                Ok(s) => main_loop(s),
+                Err((s,msg)) => {
+                    println!("{}", msg);
+                    main_loop(s)
                 }
             }
         }
     }
+}
+
+fn main() {
+    let state = AppState::initial_state();
+    main_loop(state);
 }
 

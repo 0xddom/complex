@@ -1,7 +1,6 @@
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Add, Sub, Mul};
 
-#[derive(Copy)]
 pub struct Complex {
     real: f64,
     imaginary: f64,
