@@ -9,7 +9,7 @@ mod repl;
 use repl::{read_command, Command, AppState, eval_cmd};
 
 fn main_loop(state: AppState) {
-   match read_command() {
+    match read_command() {
         Err(msg) => println!("{}", msg),
         Ok(Command::Exit) => return,
         Ok(cmd) => {
