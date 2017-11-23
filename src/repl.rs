@@ -2,6 +2,7 @@ use complex::Complex;
 use std::cmp::PartialEq;
 use std::io::{Write, stdout};
 use std::str::SplitWhitespace;
+use complex::parser::parse_from_string;
 
 pub enum State {
     Number,
@@ -40,7 +41,7 @@ impl AppState {
     }
 
     pub fn new_with_state(state: State) -> AppState {
-        AppState::new(state, Complex::new(0.0, 0.0))
+        AppState::new(state, Complex::zero())
     }
 
     pub fn state(self) -> State {
@@ -64,7 +65,17 @@ fn parse_command(head: &str, tail: SplitWhitespace) -> Result<Command, String> {
         "imaginary" => Ok(Command::Imaginary),
         "power" => Err("TODO".into()),
         "root" => Err("TODO".into()),
-        s => Err(format!("Unknown command: {}", s)),
+        s => {
+            let mut v = vec![s];
+            for t in tail {
+                v.push(t);
+            }
+            
+            match parse_from_string(v.join(" ")) {
+                Ok(cplx) => Ok(Command::Number(cplx)),
+                Err(unk) => Err(format!("Unknown command: {}", unk))
+            }
+        }
     }
 }
 
@@ -106,15 +117,15 @@ fn common_cmds(current_num: Complex,
         Command::Clear => Ok(AppState::initial_state()),
         Command::Help => {
             print_help();
-            Ok(AppState::new(State::Number, current_num))
+            Ok(AppState::new(state, current_num))
         }
         Command::Real => {
             println!("{}", current_num.real());
-            Ok(AppState::new(State::Operation, current_num))
+            Ok(AppState::new(state, current_num))
         }
         Command::Imaginary => {
             println!("{}", current_num.imaginary());
-            Ok(AppState::new(State::Operation, current_num))
+            Ok(AppState::new(state, current_num))
         }
         _ => Err((AppState::new(state, current_num), (err_msg))),
     }

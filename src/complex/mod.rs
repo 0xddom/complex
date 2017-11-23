@@ -1,3 +1,5 @@
+pub mod parser;
+
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Add, Sub, Mul};
 
@@ -12,6 +14,10 @@ impl Complex {
             real: real,
             imaginary: imaginary,
         }
+    }
+
+    pub fn zero() -> Complex {
+        Complex::new(0.0, 0.0)
     }
 
     pub fn real(&self) -> f64 {
