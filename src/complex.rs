@@ -24,7 +24,7 @@ impl Complex {
 }
 
 impl PartialEq for Complex {
-    fn eq(&self, other:&Complex) -> bool {
+    fn eq(&self, other: &Complex) -> bool {
         self.real == other.real && self.imaginary == other.imaginary
     }
 }
@@ -33,25 +33,23 @@ impl Eq for Complex {}
 
 impl Add for Complex {
     type Output = Self;
-    
+
     fn add(self, other: Self) -> Self {
-        Complex::new(self.real + other.real(),
-                     self.imaginary + other.imaginary())
+        Complex::new(self.real + other.real(), self.imaginary + other.imaginary())
     }
 }
 
 impl Sub for Complex {
     type Output = Self;
-    
+
     fn sub(self, other: Self) -> Self {
-        Complex::new(self.real - other.real(),
-                     self.imaginary - other.imaginary())
+        Complex::new(self.real - other.real(), self.imaginary - other.imaginary())
     }
 }
 
 impl Mul for Complex {
     type Output = Self;
-    
+
     fn mul(self, other: Self) -> Self {
         Complex::new(self.real * other.real - self.imaginary * self.imaginary,
                      self.imaginary * other.real - self.real * other.imaginary)
