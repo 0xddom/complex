@@ -3,6 +3,7 @@ use regex::{Regex};
 
 // A one-liner horror story: ^\s*(?:(-?\d+(?:\.\d+)?)\s*(?:([\+-])\s*(\d+(?:\.\d+)?)j)?|(-?\d+(?:\.\d+)?)j\s*(?:([\+-])\s*(\d+(?:\.\d+)?))?)\s*$
 
+#[derive(Debug,Eq,PartialEq)]
 enum Sign {
     Pos,
     Neg
@@ -68,3 +69,101 @@ pub fn parse_from_string(s: String) -> Result<Complex, String> {
         None => Err(s)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_complex_number_parser_first_form() {
+        let input = "1+1j".into();
+        let expected = Ok(Complex::new(1.0, 1.0));
+
+        let output = parse_from_string(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_complex_number_parser_second_form() {
+        let input = "1".into();
+        let expected = Ok(Complex::new(1.0, 0.0));
+
+        let output = parse_from_string(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_complex_number_parser_third_form() {
+        let input = "1j+1".into();
+        let expected = Ok(Complex::new(1.0, 1.0));
+
+        let output = parse_from_string(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_complex_number_parser_fourth_form() {
+        let input = "1j".into();
+        let expected = Ok(Complex::new(0.0, 1.0));
+
+        let output = parse_from_string(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_complex_number_parse_bad_input() {
+        let input = "1+1".into();
+        let expected = Err("1+1".into());
+
+        let output = parse_from_string(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_plus_str_to_sign() {
+        let input = "+";
+        let expected = Sign::Pos;
+
+        let output = str_to_sign(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_empty_string_to_sign() {
+        let input = "";
+        let expected = Sign::Pos;
+
+        let output = str_to_sign(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_minus_string_to_sign() {
+        let input = "-";
+        let expected = Sign::Neg;
+
+        let output = str_to_sign(input);
+
+        assert_eq!(expected, output);
+    }
+
+    #[test]
+    fn test_create_negative_num() {
+        let input_num = "1";
+        let input_sign = Sign::Neg;
+        let expected = -1.0;
+
+        let output = create_num(input_num, input_sign);
+
+        assert_eq!(expected, output);
+    }        
+}
+        

@@ -11,6 +11,7 @@ mod complex;
 mod repl;
 mod state;
 mod command;
+mod actions;
 
 use repl::{eval_cmd};
 use state::AppState;
@@ -23,20 +24,17 @@ fn main_loop(state: AppState) {
             main_loop(state)
         }
         Ok(Command::Exit) => return,
-        Ok(cmd) => {
-            match eval_cmd(state, cmd) {
-                Ok(s) => main_loop(s),
-                Err((s, msg)) => {
-                    println!("{}", msg);
-                    println!("ERR");
-                    main_loop(s)
-                }
+        Ok(cmd) => match eval_cmd(state, cmd) {
+            Ok(s) => main_loop(s),
+            Err((s, msg)) => {
+                println!("{}", msg);
+                main_loop(s)
             }
         }
     }
 }
 
 fn main() {
-    let state = AppState::initial_state();
+    let state = AppState::default();
     main_loop(state);
 }

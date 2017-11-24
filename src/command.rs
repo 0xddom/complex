@@ -3,7 +3,7 @@ use std::str::SplitWhitespace;
 use std::io::{Write, stdout};
 use complex::parser::parse_from_string;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug)]
 pub enum Command {
     Help,
     Exit,
@@ -13,12 +13,12 @@ pub enum Command {
     Multiplication,
     Real,
     Imaginary,
-    Power(i32),
-    Root(i32),
+    Power(f32),
+    Root(f32),
     Number(Complex),
 }
 
-fn parse_command(head: &str, tail: SplitWhitespace) -> Result<Command, String> {
+fn parse_command(head: &str, mut tail: SplitWhitespace) -> Result<Command, String> {
     match head {
         "help" => Ok(Command::Help),
         "clear" => Ok(Command::Clear),
@@ -28,8 +28,24 @@ fn parse_command(head: &str, tail: SplitWhitespace) -> Result<Command, String> {
         "multiplication" => Ok(Command::Multiplication),
         "real" => Ok(Command::Real),
         "imaginary" => Ok(Command::Imaginary),
-        "power" => Err("TODO".into()),
-        "root" => Err("TODO".into()),
+        "power" => match tail.next() {
+            Some(s) => {
+                match s.parse::<f32>() {
+                    Ok(n) => Ok(Command::Power(n)),
+                    Err(_) => Err("Expecting a number".into())
+                }
+            },
+            None => Err("Expecting a number".into())
+        },
+        "root" => match tail.next() {
+            Some(s) => {
+                match s.parse::<f32>() {
+                    Ok(n) => Ok(Command::Root(n)),
+                    Err(_) => Err("Expecting a number".into())
+                }
+            },
+            None => Err("Expecting a number".into())
+        },
         s => {
             let mut v = vec![s];
             for t in tail {
@@ -154,7 +170,7 @@ mod tests {
     #[test]
     fn test_parse_power_command() {
         let input: String = "power 3".to_owned();
-        let expected: Result<Command, String> = Ok(Command::Power(3));
+        let expected: Result<Command, String> = Ok(Command::Power(3.0));
 
         let mut iter = input.split_whitespace();
         let output = parse_command(iter.next().unwrap(), iter);
@@ -165,7 +181,7 @@ mod tests {
     #[test]
     fn test_parse_root_command() {
         let input: String = "root 2".to_owned();
-        let expected: Result<Command, String> = Ok(Command::Root(2));
+        let expected: Result<Command, String> = Ok(Command::Root(2.0));
 
         let mut iter = input.split_whitespace();
         let output = parse_command(iter.next().unwrap(), iter);

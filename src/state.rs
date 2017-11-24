@@ -1,39 +1,38 @@
 use complex::Complex;
 use command::Command;
 
-pub enum State {
-    Number,
-    Operation,
-}
-
 pub struct AppState {
-    pub current_state: State,
-    pub number: Complex,
+    pub number: Option<Complex>,
     pub pending_op: Option<Command>
 }
 
 impl AppState {
-    pub fn new(state: State, complex: Complex, pending_op: Option<Command>) -> AppState {
+    pub fn new(complex: Option<Complex>, pending_op: Option<Command>) -> AppState {
         AppState {
-            current_state: state,
             number: complex,
             pending_op: pending_op
         }
     }
 
-    pub fn initial_state() -> AppState {
-        AppState::new_with_state(State::Number)
+    pub fn default() -> AppState {
+        AppState::new(None, None)
     }
+}
 
-    pub fn new_with_state(state: State) -> AppState {
-        AppState::new(state, Complex::zero(), None)
-    }
+#[cfg(test)]
+mod tests {
 
-    pub fn state(self) -> State {
-        self.current_state
-    }
+    use super::*;
 
-    pub fn number(self) -> Complex {
-        self.number
+    #[test]
+    fn test_appstate_create_func() {
+        let input_state = State::Number;
+        let input_complex = Complex::zero();
+        let input_op = None;
+        let expected = AppState { current_state: State::Number, number: Complex::zero(), pending_op: None };
+
+        let output = AppState::new(input_state, input_complex, input_op);
+
+        assert_eq!(expected, output);
     }
 }
