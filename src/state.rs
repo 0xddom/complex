@@ -26,12 +26,11 @@ mod tests {
 
     #[test]
     fn test_appstate_create_func() {
-        let input_state = State::Number;
         let input_complex = Complex::zero();
         let input_op = None;
-        let expected = AppState { current_state: State::Number, number: Complex::zero(), pending_op: None };
+        let expected = AppState { number: Complex::zero(), pending_op: None };
 
-        let output = AppState::new(input_state, input_complex, input_op);
+        let output = AppState::new(input_complex, input_op);
 
         assert_eq!(expected, output);
     }
