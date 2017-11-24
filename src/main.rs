@@ -1,4 +1,5 @@
 #![feature(use_extern_macros)]
+#![feature(try_trait)]
 
 #[macro_use]
 extern crate text_io;
