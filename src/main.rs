@@ -8,8 +8,12 @@ extern crate regex;
 
 mod complex;
 mod repl;
+mod state;
+mod command;
 
-use repl::{read_command, Command, AppState, eval_cmd};
+use repl::{eval_cmd};
+use state::AppState;
+use command::{Command, read_command};
 
 fn main_loop(state: AppState) {
     match read_command() {

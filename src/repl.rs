@@ -1,96 +1,7 @@
 use complex::Complex;
-use std::cmp::PartialEq;
 use std::io::{Write, stdout};
-use std::str::SplitWhitespace;
-use complex::parser::parse_from_string;
-
-pub enum State {
-    Number,
-    Operation,
-}
-
-pub enum Command {
-    Help,
-    Exit,
-    Clear,
-    Addition,
-    Subtraction,
-    Multiplication,
-    Real,
-    Imaginary,
-    Power(i32),
-    Root(i32),
-    Number(Complex),
-}
-
-pub struct AppState {
-    current_state: State,
-    number: Complex,
-}
-
-impl AppState {
-    pub fn new(state: State, complex: Complex) -> AppState {
-        AppState {
-            current_state: state,
-            number: complex,
-        }
-    }
-
-    pub fn initial_state() -> AppState {
-        AppState::new_with_state(State::Number)
-    }
-
-    pub fn new_with_state(state: State) -> AppState {
-        AppState::new(state, Complex::zero())
-    }
-
-    pub fn state(self) -> State {
-        self.current_state
-    }
-
-    pub fn number(self) -> Complex {
-        self.number
-    }
-}
-
-fn parse_command(head: &str, tail: SplitWhitespace) -> Result<Command, String> {
-    match head {
-        "help" => Ok(Command::Help),
-        "clear" => Ok(Command::Clear),
-        "exit" => Ok(Command::Exit),
-        "addition" => Ok(Command::Addition),
-        "subtraction" => Ok(Command::Subtraction),
-        "multiplication" => Ok(Command::Multiplication),
-        "real" => Ok(Command::Real),
-        "imaginary" => Ok(Command::Imaginary),
-        "power" => Err("TODO".into()),
-        "root" => Err("TODO".into()),
-        s => {
-            let mut v = vec![s];
-            for t in tail {
-                v.push(t);
-            }
-            
-            match parse_from_string(v.join(" ")) {
-                Ok(cplx) => Ok(Command::Number(cplx)),
-                Err(unk) => Err(format!("Unknown command: {}", unk))
-            }
-        }
-    }
-}
-
-pub fn read_command() -> Result<Command, String> {
-    print!(">>> ");
-    {
-        stdout().flush();
-    }
-    let input_str: String = read!("{}\n");
-    let mut iter = input_str.split_whitespace();
-    match iter.next() {
-        None => Err("Please enter a command".into()),
-        Some(s) => parse_command(s, iter),
-    }
-}
+use state::{AppState,State};
+use command::{Command};
 
 fn print_help() {
     println!("help - Show all available operations and commands");
@@ -104,62 +15,85 @@ fn print_help() {
     println!("power - Calculate the power. Usage: power <arg>");
     println!("root - Calculate the root. Usage: root <arg>");
     {
-        stdout().flush();
+        let _ = stdout().flush();
     }
 }
 
 fn common_cmds(current_num: Complex,
                cmd: Command,
                err_msg: String,
-               state: State)
+               state: State,
+               op: Option<Command>)
                -> Result<AppState, (AppState, String)> {
     match cmd {
         Command::Clear => Ok(AppState::initial_state()),
         Command::Help => {
             print_help();
-            Ok(AppState::new(state, current_num))
+            Ok(AppState::new(state, current_num, op))
         }
         Command::Real => {
             println!("{}", current_num.real());
-            Ok(AppState::new(state, current_num))
+            Ok(AppState::new(state, current_num, op))
         }
         Command::Imaginary => {
             println!("{}", current_num.imaginary());
-            Ok(AppState::new(state, current_num))
+            Ok(AppState::new(state, current_num, op))
         }
-        _ => Err((AppState::new(state, current_num), (err_msg))),
+        _ => Err((AppState::new(state, current_num, op), (err_msg))),
     }
 }
 
 fn eval_cmd_in_number_state(current_num: Complex,
-                            cmd: Command)
+                            cmd: Command,
+                            op: Option<Command>)
                             -> Result<AppState, (AppState, String)> {
     match cmd {
-        Command::Number(num) => Ok(AppState::new(State::Operation, num)),
-        c => common_cmds(current_num, c, "Expecting a number".into(), State::Number),
+        Command::Number(num) => match op {
+            Some(Command::Addition) => {
+                let new_num = current_num + num;
+                println!("{}", new_num);
+                Ok(AppState::new(State::Operation, new_num, None))
+            },
+            Some(Command::Subtraction) =>  {
+                let new_num = current_num - num;
+                println!("{}", new_num);
+                Ok(AppState::new(State::Operation, new_num, None))
+            },
+            Some(Command::Multiplication) =>  {
+                let new_num = current_num * num;
+                println!("{}", new_num);
+                Ok(AppState::new(State::Operation, new_num, None))
+            },
+            _ => Ok(AppState::new(State::Operation, num, None))
+        },
+        c => common_cmds(current_num, c, "Expecting a number".into(), State::Number, op),
     }
 }
 
 fn eval_cmd_in_command_state(current_num: Complex,
-                             cmd: Command)
+                             cmd: Command,
+                             op: Option<Command>)
                              -> Result<AppState, (AppState, String)> {
     match cmd {
+        Command::Addition => Ok(AppState::new(State::Number, current_num, Some(Command::Addition))),
+        Command::Subtraction => Ok(AppState::new(State::Number, current_num, Some(Command::Subtraction))),
+        Command::Multiplication => Ok(AppState::new(State::Number, current_num, Some(Command::Multiplication))),
         c => {
             common_cmds(current_num,
                         c,
                         "Expecting a command".into(),
-                        State::Operation)
+                        State::Operation, op)
         }
     }
 }
 
 pub fn eval_cmd(app_state: AppState, cmd: Command) -> Result<AppState, (AppState, String)> {
     match app_state {
-        AppState { current_state: State::Number, number: current_num } => {
-            eval_cmd_in_number_state(current_num, cmd)
+        AppState { current_state: State::Number, number: current_num, pending_op: op } => {
+            eval_cmd_in_number_state(current_num, cmd, op)
         }
-        AppState { current_state: State::Operation, number: current_num } => {
-            eval_cmd_in_command_state(current_num, cmd)
+        AppState { current_state: State::Operation, number: current_num, pending_op: op } => {
+            eval_cmd_in_command_state(current_num, cmd, op)
         }
     }
 }

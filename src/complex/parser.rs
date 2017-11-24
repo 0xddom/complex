@@ -1,5 +1,5 @@
 use complex::Complex;
-use regex::{Regex, Captures};
+use regex::{Regex};
 
 // A one-liner horror story: ^\s*(?:(-?\d+(?:\.\d+)?)\s*(?:([\+-])\s*(\d+(?:\.\d+)?)j)?|(-?\d+(?:\.\d+)?)j\s*(?:([\+-])\s*(\d+(?:\.\d+)?))?)\s*$
 
@@ -32,12 +32,12 @@ fn build_from_strings(real_sign: &str, real: &str, imaginary_sign: &str, imagina
 
 pub fn parse_from_string(s: String) -> Result<Complex, String> {
     lazy_static! {
-        static ref re: Regex = Regex::new(
+        static ref RE: Regex = Regex::new(
             r"^\s*(?:(-?)(\d+(?:\.\d+)?)\s*(?:([\+-])\s*(\d+(?:\.\d+)?)j)?|(-?)(\d+(?:\.\d+)?)j\s*(?:([\+-])\s*(\d+(?:\.\d+)?))?)\s*$"
         ).unwrap();
     }
 
-    match re.captures_iter(&s.to_owned()).next() {
+    match RE.captures_iter(&s.to_owned()).next() {
         Some(cap) => {
             let groups = (
                 cap.get(1),
