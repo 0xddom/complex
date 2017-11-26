@@ -80,18 +80,24 @@ pub fn add_number(num: Complex, state: AppState) -> Result<AppState, (AppState, 
     }
 }
 
-pub fn do_power(num: f32, state: AppState) -> Result<AppState, (AppState, String)> {
+pub fn do_power(num: f64, state: AppState) -> Result<AppState, (AppState, String)> {
     match state {
-        AppState { number: Some(cplx), pending_op: op, log: _ } =>
-            Ok(AppState::new(Some(cplx.power(num)), op, true)),
+        AppState { number: Some(cplx), pending_op: op, log: _ } => {
+            let new_num = cplx.power(num);
+            println!("{}", new_num);
+            Ok(AppState::new(Some(new_num), op, true))
+        },
         s @ AppState { number: None, pending_op: _, log: _ } => num_fst!(s)
     }
 }
 
-pub fn do_root(num: f32, state: AppState) -> Result<AppState, (AppState, String)> {
+pub fn do_root(num: f64, state: AppState) -> Result<AppState, (AppState, String)> {
     match state {
-        AppState { number: Some(cplx), pending_op: op, log: _ } =>
-            Ok(AppState::new(Some(cplx.root(num)), op, true)),
+        AppState { number: Some(cplx), pending_op: op, log: _ } => {
+            let new_num = cplx.root(num);
+            println!("{}", new_num);
+            Ok(AppState::new(Some(new_num), op, true))
+        },
         s @ AppState { number: None, pending_op: _, log: _ } => num_fst!(s)
     }
 }

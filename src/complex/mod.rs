@@ -9,6 +9,11 @@ pub struct Complex {
     imaginary: f64,
 }
 
+struct PolarComplex {
+    r: f64,
+    theta: f64
+}
+
 impl Complex {
     pub fn new(real: f64, imaginary: f64) -> Complex {
         Complex {
@@ -16,10 +21,6 @@ impl Complex {
             imaginary: imaginary,
         }
     }
-
-    /*pub fn zero() -> Complex {
-        Complex::new(0.0, 0.0)
-    }*/
 
     pub fn real(&self) -> f64 {
         self.real
@@ -29,12 +30,44 @@ impl Complex {
         self.imaginary
     }
 
-    pub fn power(&self, _: f32) -> Complex {
-        Complex::new(self.real, self.imaginary)
+    pub fn power(&self, n: f64) -> Complex {
+        self.to_polar().power(n).to_cartesian()
     }
 
-    pub fn root(&self, _: f32) -> Complex {
-        Complex::new(self.real, self.imaginary)
+    pub fn root(&self, num: f64) -> Complex {
+        self.to_polar().root(num)
+            .to_cartesian()
+    }
+
+    fn to_polar(&self) -> PolarComplex {
+        PolarComplex::new(self.real, self.imaginary)
+    }
+}
+
+impl PolarComplex {
+    pub fn new(real: f64, imaginary: f64) -> PolarComplex {
+        PolarComplex {
+            r: (real * real + imaginary * imaginary).sqrt(),
+            theta: (imaginary / real).atan()
+        }
+    }
+
+    pub fn to_cartesian(self) -> Complex {
+        Complex::new(self.r * self.theta.cos(), self.r * self.theta.sin())
+    }
+
+    pub fn root(self, num: f64) -> PolarComplex {
+        PolarComplex {
+            r: self.r.powf(1.0 / num),
+            theta: self.theta / num
+        }
+    }
+
+    pub fn power(self, num: f64) -> PolarComplex {
+        PolarComplex {
+            r: self.r.powf(num),
+            theta: self.theta * num
+        }
     }
 }
 
@@ -74,10 +107,10 @@ impl Mul for Complex {
 impl Display for Complex {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match *self {
-            Complex { real: r, imaginary: i } if i == 0.0 => write!(f, "{}", r),
-            Complex { real: r, imaginary: i } if r == 0.0 => write!(f, "{}j", i),
-            Complex { real: r, imaginary: i } if i >= 0.0 => write!(f, "{}+{}j", r, i),
-            Complex { real: r, imaginary: i } => write!(f, "{}{}j", r, i),
+            Complex { real: r, imaginary: i } if i == 0.0 => write!(f, "{:.3}", r),
+            Complex { real: r, imaginary: i } if r == 0.0 => write!(f, "{:.3}j", i),
+            Complex { real: r, imaginary: i } if i >= 0.0 => write!(f, "{:.3}+{:.3}j", r, i),
+            Complex { real: r, imaginary: i } => write!(f, "{:.3}{:.3}j", r, i),
         }
     }
 }

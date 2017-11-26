@@ -13,8 +13,8 @@ pub enum Command {
     Multiplication,
     Real,
     Imaginary,
-    Power(f32),
-    Root(f32),
+    Power(f64),
+    Root(f64),
     Number(Complex),
 }
 
@@ -30,7 +30,7 @@ fn parse_command(head: &str, mut tail: SplitWhitespace) -> Result<Command, Strin
         "imaginary" => Ok(Command::Imaginary),
         "power" => match tail.next() {
             Some(s) => {
-                match s.parse::<f32>() {
+                match s.parse::<f64>() {
                     Ok(n) => Ok(Command::Power(n)),
                     Err(_) => Err("Expecting a number".into())
                 }
@@ -39,7 +39,7 @@ fn parse_command(head: &str, mut tail: SplitWhitespace) -> Result<Command, Strin
         },
         "root" => match tail.next() {
             Some(s) => {
-                match s.parse::<f32>() {
+                match s.parse::<f64>() {
                     Ok(n) => Ok(Command::Root(n)),
                     Err(_) => Err("Expecting a number".into())
                 }
