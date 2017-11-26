@@ -3,6 +3,10 @@ use state::{AppState};
 use command::Command;
 use complex::Complex;
 
+macro_rules! num_fst {
+    ($state:expr) => (Err(($state, "You must insert a number first".into())))
+}
+
 pub fn print_help(state: AppState) -> Result<AppState, (AppState, String)> {
     println!("help - Show all available operations and commands");
     println!("exit - Quits the program");
@@ -25,58 +29,67 @@ pub fn clear() -> Result<AppState, (AppState, String)> {
 }
 
 pub fn print_real(state: AppState) -> Result<AppState, (AppState, String)> {
-    match state.number {
-        Some(cplx) => {
+    match state {
+        AppState { number: Some(cplx), pending_op: op, log: _ } => {
             println!("{}", cplx.real());
-            Ok(AppState::new(Some(cplx), state.pending_op))
+            Ok(AppState::new(Some(cplx), op, false))
         },
-        None => Err((AppState::new(None, state.pending_op), "You must insert a number first".into()))
+        s @ AppState { number: None, pending_op: _, log: _ } => num_fst!(s),
     }
 }
 
 pub fn print_imaginary(state: AppState) -> Result<AppState, (AppState, String)> {
-    match state.number {
-        Some(cplx) => {
+    match state {
+        AppState { number: Some(cplx), pending_op: op, log: _ } => {
             println!("{}", cplx.imaginary());
-            Ok(AppState::new(Some(cplx), state.pending_op))
+            Ok(AppState::new(Some(cplx), op, false))
         },
-        None => Err((AppState::new(None, state.pending_op), "You must insert a number first".into()))
+        s @ AppState { number: None, pending_op: _, log: _ } => num_fst!(s),
     }
 }
 
 pub fn add_action(state: AppState, action: Command) -> Result<AppState, (AppState, String)> {
-    match state.number {
-        Some(num) => Ok(AppState::new(Some(num), Some(action))),
-        None => Err((state, "You must insert a number first".into()))
+    match state {
+        AppState { number: Some(cplx), pending_op: _, log} => {
+            Ok(AppState::new(Some(cplx), Some(action), log))
+        },
+        s @ AppState { number: None, pending_op: _, log: _ } => num_fst!(s),
     }
 }
 
 pub fn add_number(num: Complex, state: AppState) -> Result<AppState, (AppState, String)> {
-    match state.pending_op {
-        Some(Command::Addition) => match state.number {
-            Some(number) => {
-                let new_num = number + num;
-                println!("{}", new_num);
-                Ok(AppState::new(Some(new_num), None))
-            },
-            None => Err((AppState::new(None, None), "You must insert a number first".into()))
+    match state {
+        s @ AppState { number: None, pending_op: Some(_), log: _ } => num_fst!(s),
+        AppState { number: Some(number), pending_op: Some(Command::Addition), log: _ } => {
+            let new_num = number + num;
+            println!("{}", new_num);
+            Ok(AppState::new(Some(new_num), None, true))
         },
-        Some(Command::Subtraction) => match state.number {
-            Some(number) => {
-                let new_num = number - num;
-                println!("{}", new_num);
-                Ok(AppState::new(Some(new_num), None))
-            },
-            None => Err((AppState::new(None, None), "You must insert a number first".into()))
+        AppState { number: Some(number), pending_op: Some(Command::Subtraction), log: _ } => {
+            let new_num = number - num;
+            println!("{}", new_num);
+            Ok(AppState::new(Some(new_num), None, true))
         },
-        Some(Command::Multiplication) => match state.number {
-            Some(number) => {
-                let new_num = number * num;
-                println!("{}", new_num);
-                Ok(AppState::new(Some(new_num), None))
-            },
-            None => Err((AppState::new(None, None), "You must insert a number first".into()))
+        AppState { number: Some(number), pending_op: Some(Command::Multiplication), log: _ } => {
+            let new_num = number * num;
+            println!("{}", new_num);
+            Ok(AppState::new(Some(new_num), None, true))
         },
-        _ => Ok(AppState::new(Some(num), None))
+        AppState { number: _, pending_op: None, log: _ } => Ok(AppState::new(Some(num), None, true)),
+        s => Ok(s)
+    }
+}
+
+pub fn do_power(num: f32, state: AppState) -> Result<AppState, (AppState, String)> {
+    match state.number {
+        Some(cplx) => Ok(AppState::new(Some(cplx.power(num)), state.pending_op, true)),
+        None => num_fst!(AppState::new(None, state.pending_op, false))
+    }
+}
+
+pub fn do_root(num: f32, state: AppState) -> Result<AppState, (AppState, String)> {
+    match state.number {
+        Some(cplx) => Ok(AppState::new(Some(cplx.root(num)), state.pending_op, true)),
+        None => num_fst!(AppState::new(None, state.pending_op, false))
     }
 }

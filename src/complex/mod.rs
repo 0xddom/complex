@@ -17,9 +17,9 @@ impl Complex {
         }
     }
 
-    pub fn zero() -> Complex {
+    /*pub fn zero() -> Complex {
         Complex::new(0.0, 0.0)
-    }
+    }*/
 
     pub fn real(&self) -> f64 {
         self.real
@@ -27,6 +27,14 @@ impl Complex {
 
     pub fn imaginary(&self) -> f64 {
         self.imaginary
+    }
+
+    pub fn power(&self, _: f32) -> Complex {
+        Complex::new(self.real, self.imaginary)
+    }
+
+    pub fn root(&self, _: f32) -> Complex {
+        Complex::new(self.real, self.imaginary)
     }
 }
 

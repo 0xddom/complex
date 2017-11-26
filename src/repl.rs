@@ -1,4 +1,3 @@
-use complex::Complex;
 use state::{AppState};
 use command::{Command};
 use actions::*;
@@ -13,8 +12,8 @@ pub fn eval_cmd(state: AppState, cmd: Command) -> Result<AppState, (AppState, St
         action @ Command::Addition |
         action @ Command::Multiplication => add_action(state, action),
         Command::Number(num) => add_number(num, state),
-        Command::Power(_) => Err((state, "eval_cmd::power::TODO".into())),
-        Command::Root(_) => Err((state, "eval_cmd::root::TODO".into())),
+        Command::Power(n) => do_power(n, state),
+        Command::Root(n) => do_root(n, state),
         Command::Exit => Ok(state)
     }
 }
