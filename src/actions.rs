@@ -101,3 +101,154 @@ pub fn do_root(num: f64, state: AppState) -> Result<AppState, (AppState, String)
         s @ AppState { number: None, pending_op: _, log: _ } => num_fst!(s)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_help_command__029() {
+        let ini_state = AppState::default();
+
+        assert_eq!(Ok(AppState::default()), print_help(ini_state));
+    }
+
+    #[test]
+    fn test_clear_command__030() {
+        assert_eq!(Ok(AppState::default()), clear());
+    }
+
+    #[test]
+    fn test_print_real__031__032() {
+        {
+            let ini_state = AppState::new(Some(Complex::new(1.0, 0.0)), None, true);
+            let expected = Ok(AppState::new(Some(Complex::new(1.0, 0.0)), None, false));
+
+            assert_eq!(expected, print_real(ini_state));
+        }
+        {
+            let ini_state = AppState::new(None, None, true);
+            let expected = Err((AppState::new(None, None, true), "You must insert a number first".into()));
+
+            assert_eq!(expected, print_real(ini_state));
+        }
+    }
+
+    #[test]
+    fn test_print_imaginary__033__034() {
+        {
+            let ini_state = AppState::new(Some(Complex::new(1.0, 0.0)), None, true);
+            let expected = Ok(AppState::new(Some(Complex::new(1.0, 0.0)), None, false));
+
+            assert_eq!(expected, print_imaginary(ini_state));
+        }
+        {
+            let ini_state = AppState::new(None, None, true);
+            let expected = Err((AppState::new(None, None, true), "You must insert a number first".into()));
+
+            assert_eq!(expected, print_imaginary(ini_state));
+        }
+    }
+
+    #[test]
+    fn test_add_action__035__036() {
+        {
+            let input_state = AppState::new(Some(Complex::new(1.0, 0.0)), None, true);
+            let expected = Ok(AppState::new(Some(Complex::new(1.0, 0.0)), Some(Command::Addition), true));
+
+            let output = add_action(input_state, Command::Addition);
+
+            assert_eq!(expected, output);
+        }
+        {
+            let input_state = AppState::new(None, None, true);
+            let expected = Err((AppState::new(None, None, true), "You must insert a number first".into()));
+
+            let output = add_action(input_state, Command::Addition);
+
+            assert_eq!(expected, output);
+        }
+    }
+
+    #[test]
+    fn test_add_number_action__037__038__039__040__041__042() {
+        {
+            let input_num = Complex::new(1.0, 1.0);
+            let input_state = AppState::new(None, Some(Command::Addition), false);
+            let expected = Err((AppState::new(None, Some(Command::Addition), false), "You must insert a number first".into()));
+
+            assert_eq!(expected, add_number(input_num, input_state));
+        }
+        {
+            let input_num = Complex::new(1.0, 1.0);
+            let input_state = AppState::new(Some(Complex::new(0.0, 0.0)), Some(Command::Addition), false);
+            let expected = Ok(AppState::new(Some(Complex::new(1.0, 1.0)), None, true));
+
+            assert_eq!(expected, add_number(input_num, input_state));
+        }
+        {
+            let input_num = Complex::new(1.0, 1.0);
+            let input_state = AppState::new(Some(Complex::new(1.0, 1.0)), Some(Command::Subtraction), false);
+            let expected = Ok(AppState::new(Some(Complex::new(0.0, 0.0)), None, true));
+
+            assert_eq!(expected, add_number(input_num, input_state));
+        }
+        {
+            let input_num = Complex::new(1.0, 1.0);
+            let input_state = AppState::new(Some(Complex::new(1.0, 1.0)), Some(Command::Multiplication), false);
+            let expected = Ok(AppState::new(Some(Complex::new(0.0, 0.0)), None, true));
+
+            assert_eq!(expected, add_number(input_num, input_state));
+        }
+        {
+            let input_num = Complex::new(1.0, 0.0);
+            let input_state = AppState::new(None, None, false);
+            let expected = Ok(AppState::new(Some(Complex::new(1.0, 0.0)), None, true));
+
+            assert_eq!(expected, add_number(input_num, input_state));
+        }
+        {
+            let input_num = Complex::new(1.0, 0.0);
+            let input_state = AppState::new(Some(Complex::new(0.0, 0.0)), Some(Command::Help), false);
+            let expected = Ok(AppState::new(Some(Complex::new(0.0, 0.0)), Some(Command::Help), false));
+
+            assert_eq!(expected, add_number(input_num, input_state));
+        }
+    }
+
+    #[test]
+    fn test_power__043__044() {
+        {
+            let input_num = 2.0;
+            let input_state = AppState::new(Some(Complex::new(2.0, 2.0)), None, false);
+            let expected = Ok(AppState::new(Some(Complex::new(0.0000000000000004898587196589414, 8.000000000000002)), None, true));
+
+            assert_eq!(expected, do_power(input_num, input_state));
+        }
+        {
+            let input_num = 2.0;
+            let input_state = AppState::new(None, None, false);
+            let expected = Err((AppState::new(None, None, false), "You must insert a number first".into()));
+
+            assert_eq!(expected, do_power(input_num, input_state));
+        }
+    }
+
+    #[test]
+    fn test_root__045__046() {
+        {
+            let input_num = 2.0;
+            let input_state = AppState::new(Some(Complex::new(2.0, 2.0)), None, false);
+            let expected = Ok(AppState::new(Some(Complex::new(1.5537739740300374, 0.6435942529055827)), None, true));
+
+            assert_eq!(expected, do_root(input_num, input_state));
+        }
+        {
+            let input_num = 2.0;
+            let input_state = AppState::new(None, None, false);
+            let expected = Err((AppState::new(None, None, false), "You must insert a number first".into()));
+
+            assert_eq!(expected, do_root(input_num, input_state));
+        }
+    }
+}

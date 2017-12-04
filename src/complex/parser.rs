@@ -76,7 +76,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_complex_number_parser_first_form() {
+    fn test_complex_number_parser_first_form__020() {
         let input = "1+1j".into();
         let expected = Ok(Complex::new(1.0, 1.0));
 
@@ -86,7 +86,7 @@ mod tests {
     }
 
     #[test]
-    fn test_complex_number_parser_second_form() {
+    fn test_complex_number_parser_second_form__021() {
         let input = "1".into();
         let expected = Ok(Complex::new(1.0, 0.0));
 
@@ -96,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn test_complex_number_parser_third_form() {
+    fn test_complex_number_parser_third_form__022() {
         let input = "1j+1".into();
         let expected = Ok(Complex::new(1.0, 1.0));
 
@@ -106,7 +106,7 @@ mod tests {
     }
 
     #[test]
-    fn test_complex_number_parser_fourth_form() {
+    fn test_complex_number_parser_fourth_form__023() {
         let input = "1j".into();
         let expected = Ok(Complex::new(0.0, 1.0));
 
@@ -116,7 +116,7 @@ mod tests {
     }
 
     #[test]
-    fn test_complex_number_parse_bad_input() {
+    fn test_complex_number_parse_bad_input__024() {
         let input = "1+1".into();
         let expected = Err("1+1".into());
 
@@ -126,7 +126,7 @@ mod tests {
     }
 
     #[test]
-    fn test_plus_str_to_sign() {
+    fn test_plus_str_to_sign__025() {
         let input = "+";
         let expected = Sign::Pos;
 
@@ -136,7 +136,7 @@ mod tests {
     }
 
     #[test]
-    fn test_empty_string_to_sign() {
+    fn test_empty_string_to_sign__026() {
         let input = "";
         let expected = Sign::Pos;
 
@@ -146,7 +146,7 @@ mod tests {
     }
 
     #[test]
-    fn test_minus_string_to_sign() {
+    fn test_minus_string_to_sign__027() {
         let input = "-";
         let expected = Sign::Neg;
 
@@ -156,7 +156,7 @@ mod tests {
     }
 
     #[test]
-    fn test_create_negative_num() {
+    fn test_create_negative_num__028() {
         let input_num = "1";
         let input_sign = Sign::Neg;
         let expected = -1.0;

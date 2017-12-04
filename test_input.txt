@@ -1,0 +1,6 @@
+help
+bad
+addition
+1+1j
+addition
+exit

@@ -56,3 +56,13 @@ fn main() {
     };
     main_loop(state, &mut results_file);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_main__064() {
+        main();
+    }
+}

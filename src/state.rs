@@ -1,6 +1,7 @@
 use complex::Complex;
 use command::Command;
 
+#[derive(Debug, PartialEq)]
 pub struct AppState {
     pub number: Option<Complex>,
     pub pending_op: Option<Command>,
@@ -21,19 +22,3 @@ impl AppState {
     }
 }
 
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-
-    #[test]
-    fn test_appstate_create_func() {
-        let input_complex = Complex::zero();
-        let input_op = None;
-        let expected = AppState { number: Complex::zero(), pending_op: None };
-
-        let output = AppState::new(input_complex, input_op);
-
-        assert_eq!(expected, output);
-    }
-}

@@ -3,7 +3,7 @@ use std::str::SplitWhitespace;
 use std::io::{Write, stdout};
 use complex::parser::parse_from_string;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Command {
     Help,
     Exit,
@@ -76,11 +76,9 @@ pub fn read_command() -> Result<Command, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::{self, Read};
-    use std::ops::Try;
     
     #[test]
-    fn test_parse_help_command() {
+    fn test_parse_help_command__047() {
         let input: String = "help".to_owned();
         let expected: Result<Command, String> = Ok(Command::Help);
 
@@ -91,7 +89,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_clear_command() {
+    fn test_parse_clear_command__048() {
         let input: String = "clear".to_owned();
         let expected: Result<Command, String> = Ok(Command::Clear);
 
@@ -102,7 +100,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_exit_command() {
+    fn test_parse_exit_command__049() {
         let input: String = "exit".to_owned();
         let expected: Result<Command, String> = Ok(Command::Exit);
 
@@ -113,7 +111,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_addition_command() {
+    fn test_parse_addition_command__050() {
         let input: String = "addition".to_owned();
         let expected: Result<Command, String> = Ok(Command::Addition);
 
@@ -124,7 +122,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_subtraction_command() {
+    fn test_parse_subtraction_command__051() {
         let input: String = "subtraction".to_owned();
         let expected: Result<Command, String> = Ok(Command::Subtraction);
 
@@ -135,7 +133,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_multiplication_command() {
+    fn test_parse_multiplication_command__052() {
         let input: String = "multiplication".to_owned();
         let expected: Result<Command, String> = Ok(Command::Multiplication);
 
@@ -146,7 +144,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_real_command() {
+    fn test_parse_real_command__053() {
         let input: String = "real".to_owned();
         let expected: Result<Command, String> = Ok(Command::Real);
 
@@ -157,7 +155,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_imaginary_command() {
+    fn test_parse_imaginary_command__054() {
         let input: String = "imaginary".to_owned();
         let expected: Result<Command, String> = Ok(Command::Imaginary);
 
@@ -168,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_power_command() {
+    fn test_parse_power_command__055() {
         let input: String = "power 3".to_owned();
         let expected: Result<Command, String> = Ok(Command::Power(3.0));
 
@@ -179,7 +177,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_root_command() {
+    fn test_parse_root_command__056() {
         let input: String = "root 2".to_owned();
         let expected: Result<Command, String> = Ok(Command::Root(2.0));
 
@@ -190,7 +188,51 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_an_unknown_command() {
+    fn test_parse_bad_power_command__057__058() {
+        {
+            let input: String = "power".to_owned();
+            let expected: Result<Command, String> = Err("Expecting a number".into());
+
+            let mut iter = input.split_whitespace();
+            let output = parse_command(iter.next().unwrap(), iter);
+
+            assert_eq!(expected, output);
+        }
+        {
+            let input: String = "power bad".to_owned();
+            let expected: Result<Command, String> = Err("Expecting a number".into());
+
+            let mut iter = input.split_whitespace();
+            let output = parse_command(iter.next().unwrap(), iter);
+
+            assert_eq!(expected, output);
+        }
+    }
+
+    #[test]
+    fn test_parse_bad_root_command__059__060() {
+        {
+            let input: String = "root".to_owned();
+            let expected: Result<Command, String> = Err("Expecting a number".into());
+
+            let mut iter = input.split_whitespace();
+            let output = parse_command(iter.next().unwrap(), iter);
+
+            assert_eq!(expected, output);
+        }
+        {
+            let input: String = "root bad".to_owned();
+            let expected: Result<Command, String> = Err("Expecting a number".into());
+
+            let mut iter = input.split_whitespace();
+            let output = parse_command(iter.next().unwrap(), iter);
+
+            assert_eq!(expected, output);
+        }
+    }
+
+    #[test]
+    fn test_parse_an_unknown_command__061() {
         let input: String = "unknown".to_owned();
         let expected: Result<Command, String> = Err("Unknown command: unknown".into());
 
@@ -201,7 +243,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_a_complex_number() {
+    fn test_parse_a_complex_number__062() {
         let input: String = "1 +1j".to_owned();
         let expected = Ok(Command::Number(Complex::new(1.0,1.0)));
 
@@ -212,8 +254,7 @@ mod tests {
     }
 
     #[test]
-    fn test_read_command_from_stdin() {
-        let mut input: String = "help".to_owned();
+    fn test_read_command_from_stdin__063() {
         let expected = Ok(Command::Help);
 
         let output = read_command();
