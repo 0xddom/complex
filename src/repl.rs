@@ -13,7 +13,7 @@ pub fn eval_cmd(state: AppState, cmd: Command) -> Result<AppState, (AppState, St
         action @ Command::Multiplication => add_action(state, action),
         Command::Number(num) => add_number(num, state),
         Command::Power(n) => do_power(n, state),
-        Command::Root(n) => do_root(n, state),
+        Command::Root(n) => do_power(n, state),
         Command::Exit => Ok(state)
     }
 }

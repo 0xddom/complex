@@ -15,7 +15,6 @@ pub fn print_help(state: AppState) -> Result<AppState, (AppState, String)> {
     println!("subtraction - Performs subtraction to the current number");
     println!("multiplication - Performs multiplication to the current number");
     println!("real - Returns the real part of the complex number");
-    println!("imaginary - Returns the imaginary part of the complex number");
     println!("power - Calculate the power. Usage: power <arg>");
     println!("root - Calculate the root. Usage: root <arg>");
     {
@@ -66,14 +65,14 @@ pub fn add_number(num: Complex, state: AppState) -> Result<AppState, (AppState, 
             Ok(AppState::new(Some(new_num), None, true))
         },
         AppState { number: Some(number), pending_op: Some(Command::Subtraction), log: _ } => {
-            let new_num = number - num;
+            let new_num = number + num;
             println!("{}", new_num);
             Ok(AppState::new(Some(new_num), None, true))
         },
         AppState { number: Some(number), pending_op: Some(Command::Multiplication), log: _ } => {
             let new_num = number * num;
             println!("{}", new_num);
-            Ok(AppState::new(Some(new_num), None, true))
+            Ok(AppState::new(Some(new_num), None, false))
         },
         AppState { number: _, pending_op: None, log: _ } => Ok(AppState::new(Some(num), None, true)),
         s => Ok(s)
